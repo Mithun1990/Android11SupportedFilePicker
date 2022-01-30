@@ -3,11 +3,13 @@ package com.naim.androd11supportedfilemanager.picker
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import com.naim.androd11supportedfilemanager.model.SupportedFile
 import com.naim.androd11supportedfilemanager.util.Android11SupportedFileUtil
 import com.naim.androd11supportedfilemanager.util.SupportedFileAnnotationType
 import com.naim.androd11supportedfilemanager.util.getSupportedMimeType
@@ -33,7 +35,7 @@ object Android11SupportedFileManager : IAndroid11SupportedFilePicker {
 class FileManagerLifeCycleObserver constructor(
     private val context: Context,
     private val registry: ActivityResultRegistry,
-    private val onSuccess: (String) -> Unit = {}
+    private val onSuccess: (SupportedFile) -> Unit = {}
 ) :
     DefaultLifecycleObserver {
     private lateinit var resultLauncher: ActivityResultLauncher<Intent?>
@@ -48,8 +50,11 @@ class FileManagerLifeCycleObserver constructor(
             ) { result ->
                 if (result.resultCode == Activity.RESULT_OK && result.data != null) {
                     val file: File? = Android11SupportedFileUtil.from(context, result.data?.data!!)
-                    println("File Path " + file)
-                    onSuccess.invoke(file.toString())
+                    val fileName: String? =
+                        file?.let { Android11SupportedFileUtil.getFileName(it.absolutePath) }
+                    val fileExt: String? =
+                        fileName?.let { Android11SupportedFileUtil.getFileExt(it) }
+                    onSuccess.invoke(SupportedFile(fileName, file, fileExt))
                 }
 
             }

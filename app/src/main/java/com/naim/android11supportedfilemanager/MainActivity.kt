@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.widget.Button
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import com.naim.androd11supportedfilemanager.model.SupportedFile
 import com.naim.androd11supportedfilemanager.picker.FileManagerLifeCycleObserver
 import com.naim.androd11supportedfilemanager.util.SupportedFileAnnotationType
 
@@ -16,7 +17,7 @@ class MainActivity : AppCompatActivity() {
             FileManagerLifeCycleObserver(
                 this@MainActivity,
                 this.activityResultRegistry,
-                filePath
+                supportedFile
             )
         lifecycle.addObserver(observer)
 
@@ -36,6 +37,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-    private val filePath: (String) -> Unit =
-        { filePath -> println("Relative file path " + filePath) }
+    private val supportedFile: (SupportedFile) -> Unit =
+        { supportedFile -> println("Relative file path " + supportedFile.file + " " + supportedFile.fileName) }
 }

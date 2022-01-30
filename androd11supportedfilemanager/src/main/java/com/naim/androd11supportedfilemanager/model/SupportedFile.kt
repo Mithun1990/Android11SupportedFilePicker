@@ -1,3 +1,5 @@
 package com.naim.androd11supportedfilemanager.model
 
-data class SupportedFile(val fileName: String?, val filePath: String?)
+import java.io.File
+
+data class SupportedFile(val fileName: String?, val file: File?, val fileExt: String?)

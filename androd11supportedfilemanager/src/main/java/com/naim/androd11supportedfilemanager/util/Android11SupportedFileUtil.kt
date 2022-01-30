@@ -97,6 +97,24 @@ object Android11SupportedFileUtil {
         return file.length() / 1024
     }
 
+    fun getFileName(filePath: String): String? {
+        val spitFilePath = filePath.split("/")
+        return if (spitFilePath.size > 1) {
+            spitFilePath[spitFilePath.size - 1]
+        } else {
+            null
+        }
+    }
+
+    fun getFileExt(fileName: String): String? {
+        val spitFileName = fileName.split(".")
+        return if (spitFileName.size > 1) {
+            spitFileName[spitFileName.size - 1]
+        } else {
+            null
+        }
+    }
+
     const val SIZE_ONE = 1000
     const val SIZE_TWO = 2000
     const val SIZE_THREE = 3000
