@@ -1,9 +1,8 @@
 # Android11SupportedFilePicker
-> Step 1. Add the JitPack repository to your project build.gradle file 
+> Step 1. Add the JitPack repository to your project build.gradle and settings.gradle file 
 ```gradle 
 allprojects {
-		repositories {
-			...
+		repositories {	
 			maven { url 'https://jitpack.io' }
 		}
 	}
