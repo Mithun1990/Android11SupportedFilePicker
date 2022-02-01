@@ -1,4 +1,5 @@
 # Android11SupportedFilePicker
+##The Library has developed to get file using picker intent for supporting android 11 OS and other version (higher + lower).
 > Step 1. Add the JitPack repository to your project build.gradle and settings.gradle file 
 ```gradle 
 allprojects {
