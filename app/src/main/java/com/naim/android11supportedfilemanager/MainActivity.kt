@@ -5,7 +5,7 @@ import android.widget.Button
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.naim.androd11supportedfilemanager.model.SupportedFile
-import com.naim.androd11supportedfilemanager.picker.FileManagerLifeCycleObserver
+import com.naim.androd11supportedfilemanager.picker.FilePickerLifeCycleObserver
 import com.naim.androd11supportedfilemanager.util.SupportedFileAnnotationType
 
 class MainActivity : AppCompatActivity() {
@@ -14,10 +14,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val observer =
-            FileManagerLifeCycleObserver(
+            FilePickerLifeCycleObserver(
                 this@MainActivity,
                 this.activityResultRegistry,
-                supportedFile
+                supportedFileResult
             )
         lifecycle.addObserver(observer)
 
@@ -25,7 +25,8 @@ class MainActivity : AppCompatActivity() {
             observer.getFilePickerIntent(
                 mutableListOf(
                     SupportedFileAnnotationType.Type.ALL
-                )
+                ),
+                true
             )
         }
     }
@@ -37,6 +38,17 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-    private val supportedFile: (SupportedFile) -> Unit =
-        { supportedFile -> println("Relative file path " + supportedFile.file + " " + supportedFile.fileName) }
+    private val supportedFileResult: (SupportedFile?, List<SupportedFile>?) -> Unit =
+        { supportedFile, supportedFileList ->
+            /* Single File Selection result*/
+            supportedFile?.let {
+                println("Relative file path " + it.file + " " + it.fileName)
+            }
+            /* Multiple File Selection result*/
+            supportedFileList?.let {
+                for (i in it) {
+                    println("Relative file path " + i.file + " " + i.fileName)
+                }
+            }
+        }
 }

@@ -5,6 +5,7 @@ import com.naim.androd11supportedfilemanager.util.SupportedFileAnnotationType
 
 interface IAndroid11SupportedFilePicker {
     fun openFilePickerIntent(
-        fileList: List<SupportedFileAnnotationType.Type>?
+        fileList: List<SupportedFileAnnotationType.Type>?,
+        isMultipleSelectionAllowed: Boolean
     ): Intent
 }
