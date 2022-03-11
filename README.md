@@ -11,7 +11,7 @@ allprojects {
 >Step 2. Add the dependency in app level build.gradle 
 ```gradle
 dependencies {
-	   implementation 'com.github.Mithun1990:Android11SupportedFilePicker:1.0.0-SNAPSHOT-1'
+	  implementation 'com.github.Mithun1990:Android11SupportedFilePicker:1.0.0'
 	}
   ```
 >Step 3. Register an observer with higher order callback function to get the file during oncreate method of activity or fragment
@@ -20,16 +20,26 @@ dependencies {
             FilePickerLifeCycleObserver(
                 this@MainActivity,
                 this.activityResultRegistry) 
-            { supportedFile, supportedFileList ->
+            {supportedFile, supportedFileList, passAdditionalObjectRequiredAfterFilePicked ->
                 /* Single File Selection result*/
                 supportedFile?.let {
                     println("Relative file path " + it.file + " " + it.fileName)
+		    passAdditionalObjectRequiredAfterFilePicked?.let {
+                    val additionalFileInfo: String =
+                        (passAdditionalObjectRequiredAfterFilePicked as String)
+                    println("Additional file info $additionalFileInfo")
+                }
                 }
                 /* Multiple File Selection result*/
                 supportedFileList?.let {
                     for (i in it) {
                         println("Relative file path " + i.file + " " + i.fileName)
                     }
+		    passAdditionalObjectRequiredAfterFilePicked?.let {
+                    val additionalFileInfo: String =
+                        (passAdditionalObjectRequiredAfterFilePicked as String)
+                    println("Additional file info $additionalFileInfo")
+                }
                 }
             }
         lifecycle.addObserver(observer)
@@ -42,6 +52,7 @@ observer.getFilePickerIntent(
                     SupportedFileAnnotationType.Type.IMAGE,
                     SupportedFileAnnotationType.Type.PDF,
                 ),
-                true 
+                true,
+		"Any additional object can be passed through this parameter which can be used after file picked result" /* This parameter is optional*/
             )
  ```
