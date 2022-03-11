@@ -16,6 +16,7 @@ import java.io.File
 
 
 object Android11SupportedFileManager : IAndroid11SupportedFilePicker {
+
     override fun openFilePickerIntent(
         fileList: List<SupportedFileAnnotationType.Type>?,
         isMultipleSelectionAllowed: Boolean
@@ -37,9 +38,10 @@ object Android11SupportedFileManager : IAndroid11SupportedFilePicker {
 class FilePickerLifeCycleObserver constructor(
     private val context: Context,
     private val registry: ActivityResultRegistry,
-    private val onSuccess: (SupportedFile?, List<SupportedFile>?) -> Unit = { _, _ -> }
+    private val onFilePicked: (SupportedFile?, List<SupportedFile>?, Any?) -> Unit = { _, _, _ -> }
 ) :
     DefaultLifecycleObserver {
+    private var passAdditionalObjectRequiredAfterFilePicked: Any? = null
     private lateinit var resultLauncher: ActivityResultLauncher<Intent?>
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -59,10 +61,17 @@ class FilePickerLifeCycleObserver constructor(
                                 file?.let { Android11SupportedFileUtil.getFileName(it.absolutePath) }
                             val fileExt: String? =
                                 fileName?.let { Android11SupportedFileUtil.getFileExt(it) }
-                            onSuccess.invoke(SupportedFile(fileName, file, fileExt), null)
+                            onFilePicked.invoke(
+                                SupportedFile(
+                                    fileName,
+                                    file,
+                                    fileExt
+                                ), null,
+                                passAdditionalObjectRequiredAfterFilePicked
+                            )
+                            passAdditionalObjectRequiredAfterFilePicked = null
                         }
-                        result.data?.clipData?.let {
-                            val data = result.data?.clipData!!
+                        result.data?.clipData?.let { data ->
                             when {
                                 data.itemCount == 1 -> {
                                     val file: File? =
@@ -74,7 +83,15 @@ class FilePickerLifeCycleObserver constructor(
                                         file?.let { Android11SupportedFileUtil.getFileName(it.absolutePath) }
                                     val fileExt: String? =
                                         fileName?.let { Android11SupportedFileUtil.getFileExt(it) }
-                                    onSuccess.invoke(SupportedFile(fileName, file, fileExt), null)
+                                    onFilePicked.invoke(
+                                        SupportedFile(
+                                            fileName,
+                                            file,
+                                            fileExt
+                                        ), null,
+                                        passAdditionalObjectRequiredAfterFilePicked
+                                    )
+                                    passAdditionalObjectRequiredAfterFilePicked = null
                                 }
                                 data.itemCount > 1 -> {
                                     for (i in 0 until data.itemCount) {
@@ -95,22 +112,30 @@ class FilePickerLifeCycleObserver constructor(
                                             )
                                         )
                                     }
-                                    onSuccess.invoke(null, supportedFileList)
+                                    onFilePicked.invoke(
+                                        null,
+                                        supportedFileList,
+                                        passAdditionalObjectRequiredAfterFilePicked
+                                    )
+                                    passAdditionalObjectRequiredAfterFilePicked = null
                                 }
                             }
                         }
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    onSuccess.invoke(null, null)
+                    onFilePicked.invoke(null, null, null)
                 }
             }
     }
 
     fun getFilePickerIntent(
         fileList: List<SupportedFileAnnotationType.Type>?,
-        isMultipleSelectionAllowed: Boolean = false
+        isMultipleSelectionAllowed: Boolean = false,
+        passAdditionalObjectRequiredAfterFilePicked: Any? = null
     ) {
+        this.passAdditionalObjectRequiredAfterFilePicked =
+            passAdditionalObjectRequiredAfterFilePicked
         resultLauncher.launch(
             Android11SupportedFileManager.openFilePickerIntent(fileList, isMultipleSelectionAllowed)
         )
